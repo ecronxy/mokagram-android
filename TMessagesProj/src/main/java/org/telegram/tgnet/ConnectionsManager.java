@@ -25,6 +25,7 @@ import com.google.android.play.core.integrity.IntegrityTokenResponse;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.telegram.messenger.mokagram.GhostRequests;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -396,6 +397,19 @@ public class ConnectionsManager extends BaseController {
     }
 
     private void sendRequestInternal(TLObject object, RequestDelegate onComplete, RequestDelegateTimestamp onCompleteTimestamp, QuickAckDelegate onQuickAck, WriteToSocketDelegate onWriteToSocket, int flags, int datacenterId, int connectionType, boolean immediate, int requestToken) {
+        if (GhostRequests.suppress(object)) {
+            Utilities.stageQueue.postRunnable(() -> {
+                TLRPC.TL_error error = new TLRPC.TL_error();
+                error.code = 400;
+                error.text = "MOKAGRAM_GHOST_SUPPRESSED";
+                if (onComplete != null) {
+                    onComplete.run(null, error);
+                } else if (onCompleteTimestamp != null) {
+                    onCompleteTimestamp.run(null, error, 0);
+                }
+            });
+            return;
+        }
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("send request " + object + " with token = " + requestToken);
         }

@@ -231,6 +231,28 @@ android {
         }
     }
 
+    defaultConfig {
+        if (providers.gradleProperty('telegramUpstreamApps').orNull != 'true') {
+            ndk {
+                abiFilters 'arm64-v8a'
+            }
+            externalNativeBuild.cmake.arguments '-DCMAKE_JOB_POOLS=mokagram_compile=2', '-DCMAKE_JOB_POOL_COMPILE=mokagram_compile'
+        }
+        def credentials = new Properties()
+        rootProject.file('gradle/mokagram-api.properties').withInputStream { credentials.load(it) }
+        def credentialsFile = rootProject.file('mokagram.properties')
+        if (credentialsFile.exists()) {
+            credentialsFile.withInputStream { credentials.load(it) }
+        }
+        def apiId = providers.environmentVariable('TELEGRAM_API_ID').orNull?.trim() ?: credentials.getProperty('telegram.apiId', '0')
+        def apiHash = providers.environmentVariable('TELEGRAM_API_HASH').orNull?.trim() ?: credentials.getProperty('telegram.apiHash', '')
+        if (!(apiId ==~ /[0-9]{1,10}/) || new BigInteger(apiId) > Integer.MAX_VALUE || !(apiHash ==~ /[a-fA-F0-9]{32}|/)) {
+            throw new GradleException('Invalid Telegram API credentials in mokagram.properties or environment.')
+        }
+        buildConfigField 'int', 'MOKAGRAM_API_ID', apiId.toInteger().toString()
+        buildConfigField 'String', 'MOKAGRAM_API_HASH', '"' + apiHash + '"'
+    }
+
     namespace 'org.telegram.messenger'
 }
 
@@ -245,7 +267,9 @@ def getProps(String propName) {
         return "";
     }
 }
-apply plugin: 'com.google.gms.google-services'
+if (providers.gradleProperty('telegramUpstreamApps').orNull == 'true') {
+    apply plugin: 'com.google.gms.google-services'
+}
 
 task checkVisibility {
     doFirst {

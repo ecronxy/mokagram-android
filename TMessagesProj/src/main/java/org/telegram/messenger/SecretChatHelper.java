@@ -15,6 +15,8 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
+import org.telegram.messenger.mokagram.GhostPolicy;
+import org.telegram.messenger.mokagram.MokagramSettings;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.messenger.support.LongSparseIntArray;
 import org.telegram.tgnet.ConnectionsManager;
@@ -163,6 +165,10 @@ public class SecretChatHelper extends BaseController {
     }
 
     public void sendMessagesReadMessage(TLRPC.EncryptedChat encryptedChat, ArrayList<Long> random_ids, TLRPC.Message resendMessage) {
+        if (MokagramSettings.hides(GhostPolicy.Event.READ)) {
+            return;
+        }
+
         if (!(encryptedChat instanceof TLRPC.TL_encryptedChat)) {
             return;
         }

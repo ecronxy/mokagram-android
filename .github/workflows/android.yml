@@ -1,0 +1,81 @@
+name: Android
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: APK variant
+        type: choice
+        default: release
+        options: [release, debug]
+permissions:
+  contents: read
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: scripts/test-logic.sh
+      - name: Initialize Java and resource dependencies
+        run: git submodule update --init --depth 1 --jobs 4 TMessagesProj/lib/jlatexmath TMessagesProj_Modules/media
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
+      - name: Compile Android code without packaging
+        run: ./gradlew :Mokagram:compileDebugJavaWithJavac --no-daemon --max-workers=2 -Dorg.gradle.jvmargs=-Xmx5g
+  apk:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+      TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+      MOKAGRAM_KEYSTORE_BASE64: ${{ secrets.MOKAGRAM_KEYSTORE_BASE64 }}
+      MOKAGRAM_KEYSTORE_PASSWORD: ${{ secrets.MOKAGRAM_KEYSTORE_PASSWORD }}
+      APK_VARIANT: ${{ inputs.variant }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
+      - name: Configure release signing
+        if: inputs.variant == 'release'
+        run: |
+          python3 - <<'PY'
+          import base64, os
+          from pathlib import Path
+          encoded = os.environ.get('MOKAGRAM_KEYSTORE_BASE64', '')
+          password = os.environ.get('MOKAGRAM_KEYSTORE_PASSWORD', '')
+          if not encoded or not password:
+              raise SystemExit('Configure MOKAGRAM_KEYSTORE_BASE64 and MOKAGRAM_KEYSTORE_PASSWORD repository secrets.')
+          key = Path(os.environ['RUNNER_TEMP']) / 'mokagram-release.jks'
+          key.write_bytes(base64.b64decode(encoded, validate=True))
+          key.chmod(0o600)
+          escaped = password.replace('\\', '\\\\').replace('\n', '\\n').replace('\r', '\\r')
+          config = Path('mokagram-signing.properties')
+          config.write_text(f'storeFile={key}\nstorePassword={escaped}\nkeyAlias=mokagram\nkeyPassword={escaped}\n')
+          config.chmod(0o600)
+          PY
+      - run: scripts/build-apk.sh "$APK_VARIANT" --no-daemon --max-workers=2 -Dorg.gradle.jvmargs=-Xmx5g
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mokagram-arm64-${{ inputs.variant }}
+          path: Mokagram/build/outputs/apk/${{ inputs.variant }}/*.apk
+          if-no-files-found: error
+          retention-days: 14

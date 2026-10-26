@@ -1,0 +1,3 @@
+# Optional overrides for the public defaults in gradle/mokagram-api.properties.
+# telegram.apiId=
+# telegram.apiHash=

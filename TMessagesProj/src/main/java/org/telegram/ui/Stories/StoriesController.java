@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
 
+import org.telegram.messenger.mokagram.GhostPolicy;
+import org.telegram.messenger.mokagram.MokagramSettings;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLiteDatabase;
 import org.telegram.SQLite.SQLitePreparedStatement;
@@ -1279,6 +1281,10 @@ public class StoriesController {
     }
 
     public boolean markStoryAsRead(TL_stories.PeerStories userStories, TL_stories.StoryItem storyItem, boolean profile) {
+        if (MokagramSettings.hides(GhostPolicy.Event.STORY)) {
+            return false;
+        }
+
         if (storyItem == null || userStories == null) {
             return false;
         }
@@ -3720,6 +3726,10 @@ public class StoriesController {
         }
 
         protected boolean markAsRead(int storyId) {
+            if (MokagramSettings.hides(GhostPolicy.Event.STORY)) {
+                return false;
+            }
+
             if (seenStories.contains(storyId)) return false;
             seenStories.add(storyId);
             saveCache();

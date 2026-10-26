@@ -11630,4 +11630,20 @@
     <string name="NoPaidMessagesTokenUsed">un1 used your QR code and can message you for free</string>
     <string name="NoPaidMessagesTokenUsedOut">You used the QR code of un1 and can message them for free</string>
     <string name="NoPaidMessagesTokenImported">You can now message **%1$s** for free.</string>
+    <string name="MokagramSettingsDescription">Ghost mode and Mokagram preferences</string>
+    <string name="MokagramGhost">Ghost mode</string>
+    <string name="MokagramGhostRead">Do not send read receipts</string>
+    <string name="MokagramGhostOnline">Hide online status</string>
+    <string name="MokagramGhostTyping">Hide typing and upload status</string>
+    <string name="MokagramGhostStories">Hide story views</string>
+    <string name="MokagramGhostOffline">Send offline status when enabled</string>
+    <string name="MokagramGhostInfo">Applies to all accounts on this device. Sending messages can still reveal activity. Secret chats and self-destructing media need device testing before relying on this mode.</string>
+    <string name="MokagramSchedule">Ghost schedule</string>
+    <string name="MokagramScheduleFrom">From</string>
+    <string name="MokagramScheduleTo">Until</string>
+    <string name="MokagramScheduleInfo">Uses local device time, including overnight intervals. Selected options are added to the manual settings during these hours. Equal start and end times disable the interval.</string>
+    <string name="MokagramAbout">About Mokagram</string>
+    <string name="MokagramSource">Mokagram Android source code</string>
+    <string name="MokagramAuthor">mokaGram author: @ecronx</string>
+    <string name="MokagramAttribution">Unofficial Telegram client. Based on mokaGram by @ecronx (https://t.me/ecronx). https://github.com/ecronxy/mokagram. Android adaptation: kapustaltd. Only Ghost mode is ported so far; other desktop modules are not available yet.</string>
 </resources>

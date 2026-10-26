@@ -1,46 +1,37 @@
-## Telegram messenger for Android
+# Mokagram for Android
 
-[Telegram](https://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free.
-This repo contains the official source code for [Telegram App for Android](https://play.google.com/store/apps/details?id=org.telegram.messenger).
+Отдельный Android-клиент на основе [Telegram for Android](https://github.com/DrKLO/Telegram), с переносом логики [Mokagram Desktop](https://github.com/kapustaltd/mokagram).
 
-## Creating your Telegram Application
+**Основано на mokaGram, автор [@ecronx](https://t.me/ecronx). https://github.com/ecronxy/mokagram**
 
-We welcome all developers to use our API and source code to create applications on our platform.
-There are several things we require from **all developers** for the moment.
+Адаптация для Android: kapustaltd. Это изменённая версия исходников, не официальный клиент Telegram. Уведомление об авторстве: [MOKAGRAM_NOTICE.md](MOKAGRAM_NOTICE.md).
 
-1. [**Obtain your own api_id**](https://core.telegram.org/api/obtaining_api_id) for your application.
-2. Please **do not** use the name Telegram for your app — or make sure your users understand that it is unofficial.
-3. Kindly **do not** use our standard logo (white paper plane in a blue circle) as your app's logo.
-3. Please study our [**security guidelines**](https://core.telegram.org/mtproto/security_guidelines) and take good care of your users' data and privacy.
-4. Please remember to publish **your** code too in order to comply with the licences.
+## Состояние проекта
 
-### API, Protocol documentation
+Первый этап переноса, не полная копия desktop-версии. Реализованы отдельный пакет, экран настроек Mokagram и начальная логика «Призрака»: скрытие прочтений, статуса онлайн, набора текста и просмотров историй, расписание через полночь. Настройки сохраняются локально, действуют на все аккаунты и по умолчанию выключены главным переключателем.
 
-Telegram API manuals: https://core.telegram.org/api
+Поведение на устройстве требует проверки; до неё не следует полагаться на «Призрак» для конфиденциальности. Известные отличия и полный перечень модулей: [docs/PORTING.md](docs/PORTING.md).
 
-MTproto protocol manuals: https://core.telegram.org/mtproto
+## APK
 
-### Compilation Guide
+Собственный модуль приложения — `Mokagram`, пакет Debug — `ltd.kapusta.mokagram.debug`. Он устанавливается рядом с Telegram. Первая конфигурация рассчитана на **arm64-v8a**, Android 6.0 и новее.
 
-**Note**: In order to support [reproducible builds](https://core.telegram.org/reproducible-builds), this repo contains dummy release.keystore,  google-services.json and filled variables inside BuildVars.java. Before publishing your own APKs please make sure to replace all these files with your own.
+Инструкции: [docs/BUILD.md](docs/BUILD.md). По запросу владельца используются публичные API-параметры из официальных Android-исходников, одинаковые для Debug и Release. Переопределить их можно в игнорируемом `mokagram.properties` или через переменные окружения. Эти параметры не заменяют собственную регистрацию приложения и могут ограничиваться сервером Telegram.
 
-You will require Android Studio 2025.1.4, Android NDK 27.2.12479018 and Android SDK 36.
+```bash
+./scripts/build-apk.sh debug
+# Release: настройте постоянный ключ подписи по docs/BUILD.md.
+./scripts/build-apk.sh release
+```
 
-1. Clone the Telegram source code with its submodules:
-   ```bash
-   git clone --recursive --shallow-submodules https://github.com/DrKLO/Telegram.git Telegram
-   ```
-   In case you forgot the `--recursive` flag, change to the `Telegram` directory and run:
-   ```bash
-   git submodule init && git submodule update --init --recursive --depth=1
-   ```
-2. Copy your release.keystore into TMessagesProj/config
-3. Fill out RELEASE_KEY_PASSWORD, RELEASE_KEY_ALIAS, RELEASE_STORE_PASSWORD in gradle.properties to access your  release.keystore
-4.  Go to https://console.firebase.google.com/, create two android apps with application IDs org.telegram.messenger and org.telegram.messenger.beta, turn on firebase messaging and download google-services.json, which should be copied to the same folder as TMessagesProj.
-5. Open the project in the Studio (note that it should be opened, NOT imported).
-6. Fill out values in TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java – there’s a link for each of the variables showing where and which data to obtain.
-7. You are ready to compile Telegram.
+Готовый Release APK после успешной сборки: `Mokagram/build/outputs/apk/release/Mokagram-release.apk`. Release-пакет — `ltd.kapusta.mokagram`, отладочный — `ltd.kapusta.mokagram.debug`.
 
-### Localization
+GitHub Actions проверяет код при push/PR. Ручной запуск workflow **Android** собирает выбранный вариант APK. Для Release нужны Secrets подписи; API-параметры можно переопределить через Secrets `TELEGRAM_API_ID` и `TELEGRAM_API_HASH`. Debug-сборки CI подписываются временным ключом runner: для обновления поверх предыдущей CI-сборки понадобится постоянный ключ; до его настройки может потребоваться переустановка с потерей локальных данных. Не используйте такие сборки для постоянного аккаунта без резервирования локальных данных.
 
-We moved all translations to https://translations.telegram.org/en/android/. Please use it.
+## Исходники и лицензии
+
+- Исходная Android-основа: `DrKLO/Telegram`, commit `3de37c8cfb039452be7398909461da6288babf15`.
+- Desktop-логика: `kapustaltd/mokagram`, commit `bb203b658d`.
+- Android upstream лицензирован GPL v2 или новее: [LICENSE](LICENSE).
+- Переносимые доработки mokaGram — GPLv3 с сохранением авторства: [LICENSE-MOKAGRAM](LICENSE-MOKAGRAM), [MOKAGRAM_NOTICE.md](MOKAGRAM_NOTICE.md).
+- Исходная инструкция Telegram сохранена в [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md).

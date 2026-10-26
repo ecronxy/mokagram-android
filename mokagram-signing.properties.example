@@ -1,0 +1,4 @@
+storeFile=/absolute/path/to/mokagram-release.jks
+storePassword=
+keyAlias=mokagram
+keyPassword=

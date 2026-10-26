@@ -263,4 +263,20 @@
     <string name="RemindTodayAt">\'Отправить сегодня в\' HH:mm</string>
     <string name="RemindDayAt">\'Отправить\' d MMM \'в\' HH:mm</string>
     <string name="RemindDayYearAt">\'Напомнить\' d MMM yyyy \'в\' HH:mm</string>
+    <string name="MokagramSettingsDescription">Призрак и настройки Mokagram</string>
+    <string name="MokagramGhost">Призрак</string>
+    <string name="MokagramGhostRead">Не отмечать прочитанным</string>
+    <string name="MokagramGhostOnline">Скрывать «в сети»</string>
+    <string name="MokagramGhostTyping">Скрывать «печатает» и загрузку файлов</string>
+    <string name="MokagramGhostStories">Скрывать просмотр историй</string>
+    <string name="MokagramGhostOffline">Выйти из сети при включении</string>
+    <string name="MokagramGhostInfo">Действует для всех аккаунтов на устройстве. Отправка сообщений может выдавать активность. Секретные чаты и исчезающие медиа требуют проверки на устройстве, прежде чем полагаться на этот режим.</string>
+    <string name="MokagramSchedule">Расписание призрака</string>
+    <string name="MokagramScheduleFrom">С</string>
+    <string name="MokagramScheduleTo">До</string>
+    <string name="MokagramScheduleInfo">По местному времени устройства, в том числе через полночь. В эти часы выбранные опции дополняют ручные настройки. Одинаковое время начала и конца отключает интервал.</string>
+    <string name="MokagramAbout">О Mokagram</string>
+    <string name="MokagramSource">Исходный код Mokagram Android</string>
+    <string name="MokagramAuthor">Автор mokaGram: @ecronx</string>
+    <string name="MokagramAttribution">Неофициальный клиент Telegram. Основано на mokaGram, автор @ecronx (https://t.me/ecronx). https://github.com/ecronxy/mokagram. Адаптация для Android: kapustaltd. Пока перенесён только Призрак; остальные desktop-модули ещё недоступны.</string>
 </resources>

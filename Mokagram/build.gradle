@@ -1,0 +1,116 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.telegram.build-app-plugin'
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+configurations.all {
+    exclude group: 'androidx.recyclerview', module: 'recyclerview'
+}
+
+dependencies {
+    implementation project(':TMessagesProj')
+    implementation 'androidx.fragment:fragment:1.8.9'
+    implementation 'androidx.core:core:1.16.0'
+    implementation files('../TMessagesProj/libs/libgsaverification-client.aar')
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+}
+
+def signing = new Properties()
+def signingFile = rootProject.file('mokagram-signing.properties')
+if (signingFile.exists()) {
+    signingFile.withInputStream { signing.load(it) }
+}
+
+android {
+    namespace 'ltd.kapusta.mokagram'
+    compileSdk 36
+    buildToolsVersion '36.0.0'
+    ndkVersion '27.2.12479018'
+
+    defaultConfig {
+        applicationId 'ltd.kapusta.mokagram'
+        minSdk 23
+        targetSdk 36
+        versionCode Integer.parseInt(APP_VERSION_CODE)
+        versionName APP_VERSION_NAME + '-moka.1'
+        multiDexEnabled true
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
+    }
+    signingConfigs {
+        mokagram {
+            if (signing.getProperty('storeFile')) {
+                storeFile rootProject.file(signing.getProperty('storeFile'))
+                storePassword signing.getProperty('storePassword')
+                keyAlias signing.getProperty('keyAlias')
+                keyPassword signing.getProperty('keyPassword')
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            minifyEnabled false
+        }
+        release {
+            debuggable false
+            jniDebuggable false
+            signingConfig signingConfigs.mokagram
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), '../TMessagesProj/proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        buildConfig true
+    }
+    packagingOptions {
+        jniLibs.useLegacyPackaging = true
+    }
+    lint {
+        disable 'MissingTranslation', 'ExtraTranslation', 'BlockedPrivateApi'
+    }
+}
+
+def validateApi = tasks.register('validateMokagramApi') {
+    doLast {
+        def credentials = new Properties()
+        rootProject.file('gradle/mokagram-api.properties').withInputStream { credentials.load(it) }
+        def credentialsFile = rootProject.file('mokagram.properties')
+        if (credentialsFile.exists()) {
+            credentialsFile.withInputStream { credentials.load(it) }
+        }
+        def apiId = providers.environmentVariable('TELEGRAM_API_ID').orNull?.trim() ?: credentials.getProperty('telegram.apiId', '0')
+        def apiHash = providers.environmentVariable('TELEGRAM_API_HASH').orNull?.trim() ?: credentials.getProperty('telegram.apiHash', '')
+        if (!(apiId ==~ /[0-9]{1,10}/) || new BigInteger(apiId) <= 0 || new BigInteger(apiId) > Integer.MAX_VALUE || !(apiHash ==~ /[a-fA-F0-9]{32}/)) {
+            throw new GradleException('Set your own TELEGRAM_API_ID and TELEGRAM_API_HASH or fill mokagram.properties. See docs/BUILD.md.')
+        }
+    }
+}
+tasks.configureEach {
+    if (name ==~ /(?:package|assemble|bundle)(?:Debug|Release)/) {
+        dependsOn validateApi
+    }
+}
+
+def validateSigning = tasks.register('validateMokagramSigning') {
+    doLast {
+        if (!signing.getProperty('storeFile') || !rootProject.file(signing.getProperty('storeFile')).isFile()) {
+            throw new GradleException('Configure a persistent release key in mokagram-signing.properties. See docs/BUILD.md.')
+        }
+    }
+}
+tasks.configureEach {
+    if (name ==~ /(?:package|assemble|bundle)Release/) {
+        dependsOn validateSigning
+    }
+}

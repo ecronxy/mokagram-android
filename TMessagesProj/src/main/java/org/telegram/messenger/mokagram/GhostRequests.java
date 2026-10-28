@@ -38,8 +38,38 @@ public final class GhostRequests {
                 || request instanceof TLRPC.TL_channels_readMessageContents
                 || request instanceof TLRPC.TL_messages_readMentions
                 || request instanceof TLRPC.TL_messages_readReactions) {
-            return MokagramSettings.hides(GhostPolicy.Event.READ);
+            long dialogId = dialogIdOf(request);
+            return dialogId == 0 ? MokagramSettings.hides(GhostPolicy.Event.READ) : MokagramSettings.hidesRead(dialogId);
         }
         return false;
+    }
+
+    private static long dialogIdOf(TLObject request) {
+        TLRPC.InputPeer peer = null;
+        if (request instanceof TLRPC.TL_messages_readHistory) {
+            peer = ((TLRPC.TL_messages_readHistory) request).peer;
+        } else if (request instanceof TLRPC.TL_messages_readDiscussion) {
+            peer = ((TLRPC.TL_messages_readDiscussion) request).peer;
+        } else if (request instanceof TLRPC.TL_messages_readMentions) {
+            peer = ((TLRPC.TL_messages_readMentions) request).peer;
+        } else if (request instanceof TLRPC.TL_messages_readReactions) {
+            peer = ((TLRPC.TL_messages_readReactions) request).peer;
+        } else if (request instanceof TLRPC.TL_channels_readHistory) {
+            TLRPC.InputChannel channel = ((TLRPC.TL_channels_readHistory) request).channel;
+            return channel == null ? 0 : -channel.channel_id;
+        } else if (request instanceof TLRPC.TL_channels_readMessageContents) {
+            TLRPC.InputChannel channel = ((TLRPC.TL_channels_readMessageContents) request).channel;
+            return channel == null ? 0 : -channel.channel_id;
+        }
+        if (peer == null) {
+            return 0;
+        }
+        if (peer.user_id != 0) {
+            return peer.user_id;
+        }
+        if (peer.chat_id != 0) {
+            return -peer.chat_id;
+        }
+        return peer.channel_id != 0 ? -peer.channel_id : 0;
     }
 }

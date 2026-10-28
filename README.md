@@ -35,3 +35,10 @@ GitHub Actions проверяет код при push/PR. Ручной запус
 - Android upstream лицензирован GPL v2 или новее: [LICENSE](LICENSE).
 - Переносимые доработки mokaGram — GPLv3 с сохранением авторства: [LICENSE-MOKAGRAM](LICENSE-MOKAGRAM), [MOKAGRAM_NOTICE.md](MOKAGRAM_NOTICE.md).
 - Исходная инструкция Telegram сохранена в [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md).
+
+## Изменения ecronx (форк)
+
+В этом форке: дизайн в стиле mokaGram Desktop (палитра, скругления, переключатели md3, меню, пузыри без хвостов), замена «Telegram» на «mokaGram» в интерфейсе (кроме Telegram Premium и звёзд), галочки mokaGram через `api.moka.wtf` (список и события SSE, запасной путь через `@mokagent`), строка ID с датой регистрации в профиле, исключения и «Прочитать сейчас» для «Призрака», шрифт Nunito, иконка и имя mokaGram.
+
+Шрифт Nunito: SIL Open Font License 1.1 (https://openfontlicense.org), © The Nunito Project Authors.
+Свои `api_id` и `api_hash` положите в игнорируемый `mokagram.properties` (см. `mokagram.properties.example`).

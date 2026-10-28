@@ -2747,7 +2747,7 @@ public class GiftSheet extends BottomSheetWithRecyclerListView implements Notifi
         private boolean selected;
         private final Paint selectedPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private AnimatedFloat animatedSelected = new AnimatedFloat(this::invalidate, 320, CubicBezierInterpolator.EASE_OUT_QUINT);
-        private float r = dp(11);
+        private float r = dp(22); // Mokagram: карточка подарка 22 как в mkd (giftBoxGiftRadius)
 
         public void setRoundRadius(float r) {
             this.r = r;

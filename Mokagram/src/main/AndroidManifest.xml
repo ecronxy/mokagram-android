@@ -4,8 +4,8 @@
     <application
         android:name="ltd.kapusta.mokagram.MokagramApplication"
         android:label="@string/AppName"
-        android:icon="@drawable/mokagram_icon"
-        android:roundIcon="@drawable/mokagram_icon"
+        android:icon="@mipmap/mokagram_icon"
+        android:roundIcon="@mipmap/mokagram_icon_round"
         android:backupAgent="org.telegram.messenger.BackupAgent"
         tools:replace="android:name,android:label,android:icon,android:roundIcon,android:backupAgent" />
 </manifest>

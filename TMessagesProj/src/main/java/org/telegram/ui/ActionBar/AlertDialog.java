@@ -311,7 +311,10 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
 
         backgroundPaddings = new Rect();
         if (progressStyle != ALERT_TYPE_SPINNER || blurredBackground) {
-            shadowDrawable = context.getResources().getDrawable(R.drawable.popup_fixed_alert4).mutate();
+            final android.graphics.drawable.GradientDrawable mokaDialog = new android.graphics.drawable.GradientDrawable();
+            mokaDialog.setColor(0xffffffff);
+            mokaDialog.setCornerRadius(dp(28)); // Mokagram: скругление как на десктопе
+            shadowDrawable = mokaDialog;
             blurOpacity = progressStyle == ALERT_TYPE_SPINNER ? 0.55f : (isDark ? 0.80f : 0.985f);
             shadowDrawable.setColorFilter(new PorterDuffColorFilter(backgroundColor, PorterDuff.Mode.MULTIPLY));
             shadowDrawable.getPadding(backgroundPaddings);

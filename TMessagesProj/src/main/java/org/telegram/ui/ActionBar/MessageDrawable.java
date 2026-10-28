@@ -297,12 +297,12 @@ public class MessageDrawable extends Drawable {
 
         topY = top - (gradientShader instanceof BitmapShader ? heightOffset : 0);
         isTopNear = topNear;
-        isBottomNear = bottomNear;
+        isBottomNear = true; // Mokagram: без хвостиков
     }
 
     public void setTopBottomNear(boolean topNear, boolean bottomNear) {
         isTopNear = topNear;
-        isBottomNear = bottomNear;
+        isBottomNear = true; // Mokagram: без хвостиков
     }
 
     public int getTopY() {
@@ -582,7 +582,7 @@ public class MessageDrawable extends Drawable {
             nearRad = dp(6);
         } else {
             rad = dp(SharedConfig.bubbleRadius);
-            nearRad = dp(Math.min(6, SharedConfig.bubbleRadius));
+            nearRad = rad; // Mokagram: все углы одинаково круглые
         }
         int smallRad = dp(6);
 
@@ -645,7 +645,7 @@ public class MessageDrawable extends Drawable {
             nearRad = dp(6);
         } else {
             rad = dp(SharedConfig.bubbleRadius);
-            nearRad = dp(Math.min(6, SharedConfig.bubbleRadius));
+            nearRad = rad; // Mokagram: все углы одинаково круглые
         }
         int smallRad = dp(6);
         int top = Math.max(bounds.top, 0);
@@ -798,6 +798,25 @@ public class MessageDrawable extends Drawable {
                     path.lineTo(bounds.left + dp(8), top - topY + currentBackgroundHeight);
                 }
             }
+        }
+        // Mokagram: без хвостика, обычный скруглённый прямоугольник
+        {
+            boolean fullTop = drawFullBubble || currentType == TYPE_PREVIEW || customPaint || drawFullTop;
+            boolean fullBottom = drawFullBubble || currentType == TYPE_PREVIEW || customPaint || drawFullBottom;
+            float roundTop = fullTop ? bounds.top + padding : top - topY - dp(2);
+            float roundBottom = fullBottom ? bounds.bottom - padding : top - topY + currentBackgroundHeight;
+            float roundLeft = bounds.left + padding;
+            float roundRight = bounds.right - padding;
+            if (currentType != TYPE_MEDIA) {
+                if (isOut) {
+                    roundRight = bounds.right - dp(8);
+                } else {
+                    roundLeft = bounds.left + dp(8);
+                }
+            }
+            path.rewind();
+            rect.set(roundLeft, roundTop, roundRight, roundBottom);
+            path.addRoundRect(rect, rad, rad, Path.Direction.CW);
         }
         path.close();
     }

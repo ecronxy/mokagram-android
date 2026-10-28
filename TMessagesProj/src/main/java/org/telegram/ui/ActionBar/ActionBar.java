@@ -1545,7 +1545,17 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                         textTop = (getCurrentActionBarHeight() - titleTextView[i].getTextHeight()) / 2;
                     }
                 }
-                titleTextView[i].layout(textLeft, additionalTop + textTop - titleTextView[i].getPaddingTop(), textLeft + titleTextView[i].getMeasuredWidth(), additionalTop + textTop + titleTextView[i].getTextHeight() - titleTextView[i].getPaddingTop() + titleTextView[i].getPaddingBottom());
+                int titleX = textLeft;
+                if (!glassMode && !AndroidUtilities.isTablet() && backButtonImageView != null && backButtonImageView.getVisibility() != GONE && (subtitleTextView == null || subtitleTextView.getVisibility() == GONE) && !(menu != null && menu.searchFieldVisible())) {
+                    // Mokagram: заголовок по центру, как на iOS
+                    final int menuWidth = menu != null && menu.getVisibility() != GONE ? menu.getMeasuredWidth() : 0;
+                    final int textWidth = Math.min(titleTextView[i].getTextWidth(), titleTextView[i].getMeasuredWidth());
+                    final int centered = (getMeasuredWidth() - textWidth) / 2;
+                    if (centered >= textLeft && centered + textWidth <= getMeasuredWidth() - menuWidth - dp(8)) {
+                        titleX = centered;
+                    }
+                }
+                titleTextView[i].layout(titleX, additionalTop + textTop - titleTextView[i].getPaddingTop(), titleX + titleTextView[i].getMeasuredWidth(), additionalTop + textTop + titleTextView[i].getTextHeight() - titleTextView[i].getPaddingTop() + titleTextView[i].getPaddingBottom());
             }
         }
         if (additionalSubTitleOverlayContainer != null) {

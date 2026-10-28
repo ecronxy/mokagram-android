@@ -162,7 +162,11 @@ public class ActionBarPopupWindow extends PopupWindow {
             this.resourcesProvider = resourcesProvider;
 
             if (resId != 0) {
-                backgroundDrawable = getResources().getDrawable(resId).mutate();
+                // Mokagram: скругление меню как на десктопе
+                final android.graphics.drawable.GradientDrawable moka = new android.graphics.drawable.GradientDrawable();
+                moka.setColor(0xffffffff);
+                moka.setCornerRadius(dp(22));
+                backgroundDrawable = moka;
                 setPadding(dp(8), dp(8), dp(8), dp(8));
             }
             if (backgroundDrawable != null) {

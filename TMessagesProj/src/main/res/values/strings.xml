@@ -11646,4 +11646,12 @@
     <string name="MokagramSource">Mokagram Android source code</string>
     <string name="MokagramAuthor">mokaGram author: @ecronx</string>
     <string name="MokagramAttribution">Unofficial Telegram client. Based on mokaGram by @ecronx (https://t.me/ecronx). https://github.com/ecronxy/mokagram. Android adaptation: kapustaltd. Only Ghost mode is ported so far; other desktop modules are not available yet.</string>
+    <string name="MokagramReadNow">Read now</string>
+    <string name="MokagramReadNowDone">Marked as read</string>
+    <string name="MokagramReadExceptionOn">Always read here</string>
+    <string name="MokagramReadExceptionOff">Hide reads here again</string>
+    <string name="MokagramReadExceptionAdded">Reads in this chat are sent</string>
+    <string name="MokagramReadExceptionRemoved">Ghost applies to this chat again</string>
+    <string name="MokagramPrivacy">Privacy</string>
+    <string name="MokagramScheduleTime">Time</string>
 </resources>

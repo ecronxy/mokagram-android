@@ -68,4 +68,32 @@ public final class MokagramSettings {
         }
     }
 
+
+    private static final java.util.Set<Long> readNowBypass = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+
+    public static boolean isReadException(long dialogId) {
+        return preferences().getStringSet("ghost.read_exceptions", java.util.Collections.emptySet()).contains(Long.toString(dialogId));
+    }
+
+    public static boolean toggleReadException(long dialogId) {
+        java.util.Set<String> set = new java.util.HashSet<>(preferences().getStringSet("ghost.read_exceptions", java.util.Collections.emptySet()));
+        String key = Long.toString(dialogId);
+        boolean added = set.add(key);
+        if (!added) {
+            set.remove(key);
+        }
+        preferences().edit().putStringSet("ghost.read_exceptions", set).apply();
+        return added;
+    }
+
+    public static boolean hidesRead(long dialogId) {
+        return hides(GhostPolicy.Event.READ) && !isReadException(dialogId) && !readNowBypass.contains(dialogId);
+    }
+
+    public static void readNow(int account, long dialogId, int maxId) {
+        readNowBypass.add(dialogId);
+        org.telegram.messenger.MessagesController controller = org.telegram.messenger.MessagesController.getInstance(account);
+        controller.markDialogAsRead(dialogId, maxId, maxId, 0, false, 0, 0, true, 0);
+        org.telegram.messenger.AndroidUtilities.runOnUIThread(() -> readNowBypass.remove(dialogId), 6000);
+    }
 }

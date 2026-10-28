@@ -147,6 +147,12 @@ public class LiteMode {
     }
 
     public static boolean isEnabled(int flag) {
+        if (flag == FLAG_LIQUID_GLASS && android.os.Build.VERSION.SDK_INT >= 33) {
+            return true; // Mokagram: liquid glass всегда включён
+        }
+        if (flag == FLAG_LIQUID_GLASS && android.os.Build.VERSION.SDK_INT >= 33) {
+            return true; // Mokagram: liquid glass всегда включён
+        }
         if (flag == FLAG_CHAT_FORUM_TWOCOLUMN && AndroidUtilities.isTablet()) {
             // always enabled for tablets
             return true;
@@ -155,6 +161,12 @@ public class LiteMode {
     }
 
     public static boolean isEnabledSetting(int flag) {
+        if (flag == FLAG_LIQUID_GLASS && android.os.Build.VERSION.SDK_INT >= 33) {
+            return true;
+        }
+        if (flag == FLAG_LIQUID_GLASS && android.os.Build.VERSION.SDK_INT >= 33) {
+            return true;
+        }
         return (getValue(true) & flag) > 0;
     }
 

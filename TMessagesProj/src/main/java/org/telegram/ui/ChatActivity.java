@@ -1685,6 +1685,8 @@ public class ChatActivity extends BaseFragment implements
     private final static int view_as_topics = 59;
 
     private final static int search = 40;
+    private final static int mokagram_read_exception = 9001;
+    private final static int mokagram_read_now = 9002;
 
     private final static int topic_close = 60;
     private final static int open_forum = 61;
@@ -4009,6 +4011,12 @@ public class ChatActivity extends BaseFragment implements
                     getSendMessagesHelper().sendMessage(SendMessagesHelper.SendMessageParams.of("/help", dialog_id, null, null, null, false, null, null, null, true, 0, 0, null, false));
                 } else if (id == bot_settings) {
                     getSendMessagesHelper().sendMessage(SendMessagesHelper.SendMessageParams.of("/settings", dialog_id, null, null, null, false, null, null, null, true, 0, 0, null, false));
+                } else if (id == mokagram_read_now) {
+                    org.telegram.messenger.mokagram.MokagramSettings.readNow(currentAccount, dialog_id, Math.max(1, chatAdapter != null && messages != null && !messages.isEmpty() ? messages.get(0).getId() : 1));
+                    BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.ic_ban, LocaleController.getString(R.string.MokagramReadNowDone)).show();
+                } else if (id == mokagram_read_exception) {
+                    boolean on = org.telegram.messenger.mokagram.MokagramSettings.toggleReadException(dialog_id);
+                    BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.ic_ban, LocaleController.getString(on ? R.string.MokagramReadExceptionAdded : R.string.MokagramReadExceptionRemoved)).show();
                 } else if (id == search) {
                     openSearchWithText(isSupportedTags() ? "" : null);
                 } else if (id == translate) {
@@ -4465,6 +4473,11 @@ public class ChatActivity extends BaseFragment implements
 
             if (searchItem != null) {
                 headerItem.lazilyAddSubItem(search, R.drawable.msg_search, LocaleController.getString(R.string.Search));
+            }
+            if (org.telegram.messenger.mokagram.MokagramSettings.get("ghost.enabled", false)) {
+                headerItem.lazilyAddSubItem(mokagram_read_now, R.drawable.msg_markread, LocaleController.getString(R.string.MokagramReadNow));
+                headerItem.lazilyAddSubItem(mokagram_read_exception, R.drawable.msg_seen, LocaleController.getString(
+                        org.telegram.messenger.mokagram.MokagramSettings.isReadException(dialog_id) ? R.string.MokagramReadExceptionOff : R.string.MokagramReadExceptionOn));
             }
             if (ChatObject.isBoostSupported(currentChat) && (getUserConfig().isPremium() || ChatObject.isBoosted(chatInfo) || ChatObject.hasAdminRights(currentChat))) {
                 RLottieDrawable drawable = new RLottieDrawable(R.raw.boosts, dp(24), dp(24));
@@ -18021,7 +18034,7 @@ public class ChatActivity extends BaseFragment implements
                 }
             }
             if (scrimViewReaction == null || scrimView == null) {
-                if (scrimBlurBitmapPaint != null) {
+                if (false && scrimBlurBitmapPaint != null) { // Mokagram: размытый фон не рисуем, снимок нужен только стеклу реакций
                     scrimBlurMatrix.reset();
                     final float s = (float) getMeasuredWidth() / scrimBlurBitmap.getWidth();
                     scrimBlurMatrix.postScale(s, s);
@@ -31361,12 +31374,11 @@ public class ChatActivity extends BaseFragment implements
             popupLayout.setBackgroundColor(getThemedColor(Theme.key_actionBarDefaultSubmenuBackground));
             MessageSeenView messageSeenView = null;
 
-            updateScrimSourceBitmap();
-
-            popupLayout.setBackground(scrimBlur3Factory.create(popupLayout, true)
-                .setColorProvider(BlurredBackgroundProviderImpl.messageMenuBackground(resourceProvider))
-                .setRadius(dp(12))
-                .setPadding(dp(8)));
+            // Mokagram: меню сообщения как на десктопе: сплошной фон, скругление 24, без размытия
+            final android.graphics.drawable.GradientDrawable mokaMenuBg = new android.graphics.drawable.GradientDrawable();
+            mokaMenuBg.setColor(0xff2c2c2e);
+            mokaMenuBg.setCornerRadius(dp(22));
+            popupLayout.setBackground(new android.graphics.drawable.InsetDrawable(mokaMenuBg, dp(8)));
 
             boolean addGap = false;
 

@@ -412,7 +412,9 @@ public class ActionBarMenuSubItem extends FrameLayout {
     }
 
     public void updateBackground() {
-        setBackground(Theme.createRadSelectorDrawable(selectorColor, top ? selectorRad : 0, bottom ? selectorRad : 0));
+        // Mokagram: пункт-пилюля с отступами, как в меню десктопа
+        setBackground(new android.graphics.drawable.InsetDrawable(
+            Theme.createRadSelectorDrawable(selectorColor, dp(20), dp(20)), dp(6), dp(1), dp(6), dp(1)));
     }
 
     private int getThemedColor(int key) {

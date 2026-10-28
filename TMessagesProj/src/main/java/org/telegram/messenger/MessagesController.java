@@ -6846,6 +6846,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public boolean putUser(TLRPC.User user, boolean fromCache, boolean force) {
+        org.telegram.messenger.mokagram.Badges.apply(user);
         if (user == null) {
             return false;
         }
@@ -7822,6 +7823,7 @@ public class MessagesController extends BaseController implements NotificationCe
                             getNotificationCenter().postNotificationName(NotificationCenter.blockedUsersDidLoad);
                         }
                     }
+                    org.telegram.messenger.mokagram.Badges.applyFull(user, userFull);
                     fullUsers.put(user.id, userFull);
                     final boolean contactBlockedChanged = syncUserContactBlocked(user.id, userFull);
                     getTranslateController().updateDialogFull(user.id);
@@ -10485,6 +10487,7 @@ public class MessagesController extends BaseController implements NotificationCe
                 }
             }
             if (info != null) {
+                org.telegram.messenger.mokagram.Badges.applyFull(user, info);
                 if (fullUsers.get(user.id) == null) {
                     fullUsers.put(user.id, info);
                     getTranslateController().updateDialogFull(user.id);
@@ -14396,7 +14399,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void markMessageContentAsRead(MessageObject messageObject) {
-        if (MokagramSettings.hides(GhostPolicy.Event.READ)) {
+        if (MokagramSettings.hidesRead(messageObject.getDialogId())) {
             return;
         }
 
@@ -14438,7 +14441,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void markMentionMessageAsRead(int mid, long channelId, long did) {
-        if (MokagramSettings.hides(GhostPolicy.Event.READ)) {
+        if (MokagramSettings.hidesRead(did)) {
             return;
         }
 
@@ -14567,7 +14570,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     private void completeReadTask(ReadTask task) {
-        if (MokagramSettings.hides(GhostPolicy.Event.READ)) {
+        if (MokagramSettings.hidesRead(task.dialogId)) {
             return;
         }
 
@@ -14673,7 +14676,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void markMentionsAsRead(long dialogId, long topicId) {
-        if (MokagramSettings.hides(GhostPolicy.Event.READ)) {
+        if (MokagramSettings.hidesRead(dialogId)) {
             return;
         }
 
@@ -14691,7 +14694,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void markDialogAsRead(long dialogId, int maxPositiveId, int maxNegativeId, int maxDate, boolean popup, long threadId, int countDiff, boolean readNow, int scheduledCount) {
-        if (MokagramSettings.hides(GhostPolicy.Event.READ)) {
+        if (MokagramSettings.hidesRead(dialogId)) {
             return;
         }
 

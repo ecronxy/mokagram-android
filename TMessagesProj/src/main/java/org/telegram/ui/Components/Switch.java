@@ -377,12 +377,14 @@ public class Switch extends View {
             return;
         }
 
-        int width = AndroidUtilities.dp(31);
-        int thumb = AndroidUtilities.dp(20);
+        // Mokagram: переключатель в стиле md3
+        int width = AndroidUtilities.dp(36);
+        int trackHeight = AndroidUtilities.dp(22);
         int x = (getMeasuredWidth() - width) / 2;
-        float y = (getMeasuredHeight() - AndroidUtilities.dpf2(14)) / 2;
-        int tx = x + AndroidUtilities.dp(7) + (int) (AndroidUtilities.dp(17) * progress);
+        float y = (getMeasuredHeight() - trackHeight) / 2f;
         int ty = getMeasuredHeight() / 2;
+        int tx = x + trackHeight / 2 + (int) ((width - trackHeight) * progress);
+        float thumbRadius = trackHeight * (0.25f + 0.125f * progress);
 
 
         int color1;
@@ -423,7 +425,7 @@ public class Switch extends View {
             }
 
             color1 = processColor(Theme.getColor(trackColorKey, resourcesProvider));
-            color2 = processColor(Theme.getColor(trackCheckedColorKey, resourcesProvider));
+            color2 = processColor(Theme.getColor(Theme.key_chats_actionBackground, resourcesProvider)); // Mokagram: цвет темы пользователя
             if (a == 0 && iconDrawable != null && lastIconColor != (isChecked ? color2 : color1)) {
                 iconDrawable.setColorFilter(new PorterDuffColorFilter(lastIconColor = (isChecked ? color2 : color1), PorterDuff.Mode.MULTIPLY));
             }
@@ -445,9 +447,22 @@ public class Switch extends View {
             paint.setColor(color);
             paint2.setColor(color);
 
-            rectF.set(x, y, x + width, y + AndroidUtilities.dpf2(14));
-            canvasToDraw.drawRoundRect(rectF, AndroidUtilities.dpf2(7), AndroidUtilities.dpf2(7), paint);
-            canvasToDraw.drawCircle(tx, ty, AndroidUtilities.dpf2(10), paint);
+            rectF.set(x, y, x + width, y + trackHeight);
+            canvasToDraw.drawRoundRect(rectF, trackHeight / 2f, trackHeight / 2f, paint);
+            final int fillColor = paint.getColor();
+            // контур выключенного трека и ползунок: серый -> белый
+            paint.setStyle(Paint.Style.STROKE);
+            final float outline = AndroidUtilities.dpf2(2f) * (1f - colorProgress);
+            if (outline > 0.05f) {
+                paint.setStrokeWidth(outline);
+                paint.setColor(0xff8e8e93);
+                rectF.inset(outline / 2f, outline / 2f);
+                canvasToDraw.drawRoundRect(rectF, trackHeight / 2f - outline / 2f, trackHeight / 2f - outline / 2f, paint);
+            }
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(androidx.core.graphics.ColorUtils.blendARGB(0xff8e8e93, 0xffffffff, colorProgress));
+            canvasToDraw.drawCircle(tx, ty, thumbRadius, paint);
+            paint.setColor(fillColor);
 
             if (a == 0 && rippleDrawable != null) {
                 rippleDrawable.setBounds(tx - AndroidUtilities.dp(18), ty - AndroidUtilities.dp(18), tx + AndroidUtilities.dp(18), ty + AndroidUtilities.dp(18));

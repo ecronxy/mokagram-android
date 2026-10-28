@@ -661,6 +661,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             return 0;
         });
 
+        items.add(SettingCell.Factory.of(1000, 0, 0, R.drawable.settings_privacy, "Настройки mokaGram"));
+        items.add(UItem.asShadow(null));
+
         final Set<String> suggestions = getMessagesController().pendingSuggestions;
         if (suggestions.contains("PREMIUM_GRACE")) {
             items.add(SuggestionCell.Factory.of(
@@ -716,7 +719,6 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             items.add(UItem.asShadow(null));
         }
 
-        items.add(SettingCell.Factory.of(1000, IconBackgroundColors.PURPLE.top, IconBackgroundColors.PURPLE.bottom, R.drawable.settings_privacy, "Mokagram", getString(R.string.MokagramSettingsDescription)));
         items.add(SettingCell.Factory.of(1, IconBackgroundColors.BLUE.top, IconBackgroundColors.BLUE.bottom, R.drawable.settings_account, getString(R.string.SettingsAccount), getString(R.string.SettingsAccountInfo)));
         items.add(SettingCell.Factory.of(2, IconBackgroundColors.ORANGE.top, IconBackgroundColors.ORANGE.bottom, R.drawable.settings_chat, getString(R.string.SettingsChat), getString(R.string.SettingsChatInfo)));
         items.add(SettingCell.Factory.of(3, IconBackgroundColors.GREEN.top, IconBackgroundColors.GREEN.bottom, R.drawable.settings_privacy, getString(R.string.SettingsPrivacySecurity), getString(R.string.SettingsPrivacySecurityInfo)));
@@ -1182,6 +1184,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         private final TextView valueView;
         private final boolean mini;
         private boolean hasBackground = true;
+        private ImageView chevron;
 
         public SettingCell(Context context, Theme.ResourcesProvider resourcesProvider) {
             this(context, resourcesProvider, false);
@@ -1221,7 +1224,11 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             } else {
                 addView(iconLayout, LayoutHelper.createLinear(28, 28, Gravity.CENTER_VERTICAL | Gravity.LEFT, mini ? 9 : 18, 0, 0, 0));
                 addView(textLayout, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1, Gravity.CENTER_VERTICAL | Gravity.FILL_HORIZONTAL,  mini ? 12 : 18, 0, 20, 0));
-                addView(valueView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 0, 20, 0));
+                addView(valueView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 0, 8, 0));
+                chevron = new ImageView(context);
+                chevron.setImageResource(R.drawable.msg_arrowright);
+                chevron.setScaleType(ImageView.ScaleType.CENTER);
+                addView(chevron, LayoutHelper.createLinear(24, 24, Gravity.CENTER_VERTICAL, 0, 0, 12, 0));
             }
             updateColors();
         }
@@ -1231,6 +1238,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             titleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider));
             subtitleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
             valueView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, resourcesProvider));
+            if (chevron != null) {
+                chevron.setColorFilter(new android.graphics.PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider), android.graphics.PorterDuff.Mode.SRC_IN));
+            }
             iconBackground.setDrawBorder(hasBackground && (resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark()));
         }
 
@@ -1242,6 +1252,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             CharSequence subtitle,
             CharSequence value
         ) {
+            subtitle = null; // Mokagram: строки без подписей, как на десктопе
             hasBackground = iconColorTop != 0 || iconColorBottom != 0;
             iconLayout.setVisibility(icon != 0 ? View.VISIBLE : View.GONE);
             titleView.setTranslationX(icon == 0 ? dp(2) : 0);
@@ -1254,6 +1265,30 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             subtitleView.setText(subtitle);
             setValue(value);
             updateColors();
+        }
+
+        private BackupImageView mokaEmoji;
+
+        public void setMokaEmoji(boolean on) {
+            if (!on) {
+                if (mokaEmoji != null) {
+                    mokaEmoji.setVisibility(View.GONE);
+                    iconView.setVisibility(View.VISIBLE);
+                }
+                return;
+            }
+            if (mokaEmoji == null) {
+                mokaEmoji = new BackupImageView(getContext());
+                iconLayout.addView(mokaEmoji, LayoutHelper.createFrame(28, 28, Gravity.CENTER));
+            }
+            mokaEmoji.setVisibility(View.VISIBLE);
+            iconView.setVisibility(View.GONE);
+            final TLRPC.InputStickerSet inputSet = new TLRPC.TL_inputStickerSetShortName();
+            inputSet.short_name = "mymoka";
+            MediaDataController.getInstance(UserConfig.selectedAccount).getStickerSet(inputSet, 0, false, set -> {
+                if (set == null || set.documents == null || set.documents.isEmpty()) return;
+                mokaEmoji.setImage(ImageLocation.getForDocument(set.documents.get(0)), "64_64", (android.graphics.drawable.Drawable) null, set);
+            });
         }
 
         public void setValue(CharSequence value) {
@@ -1337,6 +1372,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     item.subtext,
                     item.textValue
                 );
+                ((SettingCell) view).setMokaEmoji(item.id == 1000);
             }
 
             public static UItem of(int id, int iconColorTop, int iconColorBottom, int icon, CharSequence title) {

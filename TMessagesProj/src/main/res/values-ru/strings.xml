@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="AppName">Telegram</string>
     <string name="AppNameBeta">Telegram Beta</string>
     <string name="LanguageName">Русский</string>
     <string name="English">Английский</string>
@@ -279,4 +278,12 @@
     <string name="MokagramSource">Исходный код Mokagram Android</string>
     <string name="MokagramAuthor">Автор mokaGram: @ecronx</string>
     <string name="MokagramAttribution">Неофициальный клиент Telegram. Основано на mokaGram, автор @ecronx (https://t.me/ecronx). https://github.com/ecronxy/mokagram. Адаптация для Android: kapustaltd. Пока перенесён только Призрак; остальные desktop-модули ещё недоступны.</string>
+    <string name="MokagramReadNow">Прочитать сейчас</string>
+    <string name="MokagramReadNowDone">Отмечено прочитанным</string>
+    <string name="MokagramReadExceptionOn">Всегда читать здесь</string>
+    <string name="MokagramReadExceptionOff">Снова скрывать прочтение</string>
+    <string name="MokagramReadExceptionAdded">В этом чате прочтение отправляется</string>
+    <string name="MokagramReadExceptionRemoved">В этом чате снова работает призрак</string>
+    <string name="MokagramPrivacy">Приватность</string>
+    <string name="MokagramScheduleTime">Время</string>
 </resources>

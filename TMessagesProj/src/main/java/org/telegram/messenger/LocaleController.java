@@ -1443,12 +1443,23 @@ public class LocaleController {
         return getStringInternal(key, null, res);
     }
 
+    // Mokagram: «Telegram» -> «mokaGram» в интерфейсе, кроме Telegram Premium, звёзд Telegram, ссылок и @упоминаний
+    private static final java.util.regex.Pattern MOKA_BRAND = java.util.regex.Pattern.compile(
+        "(?<![/@.\\w-])(?<!Stars )(?<!Звёзды )(?<!Звезды )(?<!Stars of )Telegram(?![\\w.]*\\.[a-z]{2,})(?!\\s+(?:Premium|Stars|Star\\b|Звёзд|Звезд))(?!\\w)");
+
+    public static String mokaBrand(String value) {
+        if (value == null || !value.contains("Telegram")) {
+            return value;
+        }
+        return MOKA_BRAND.matcher(value).replaceAll("mokaGram");
+    }
+
     private String getStringInternal(String key, String fallback, int res) {
         final String value = getStringV2(key, res, fallback);
         if (value == null) {
             return "LOC_ERR:" + key;
         }
-        return value;
+        return mokaBrand(value);
     }
 
     public static String getServerString(String key) {

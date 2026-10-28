@@ -3287,6 +3287,9 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         setSections(dp(12), dp(16), topPadding);
     }
     public void setSections(int padding, float roundRadius, boolean topPadding) {
+        if (roundRadius > 0) {
+            roundRadius = Math.max(roundRadius, dp(22)); // Mokagram: карточки 22 как на десктопе
+        }
         setSections(
             view -> !(view instanceof TextInfoPrivacyCell || view instanceof ShadowSectionCell || view instanceof FiltersSetupActivity.HintInnerCell || view instanceof GraySectionCell || view instanceof CollapseTextCell) && !Objects.equals(view.getTag(), TAG_NOT_SECTION),
             padding,

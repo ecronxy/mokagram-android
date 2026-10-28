@@ -165,7 +165,7 @@ public final class Badges {
             text = c != null ? c.text : null;
         }
         if (text == null || text.isEmpty()) {
-            return;
+            text = russian() ? "Поддерживает mokaGram" : "Supports mokaGram";
         }
         final TL_bots.BotVerification verification = new TL_bots.BotVerification();
         verification.bot_id = 0;
@@ -266,6 +266,7 @@ public final class Badges {
             req.query = "dr:" + userId;
             req.offset = "";
             ConnectionsManager.getInstance(account).sendRequest(req, (response, error) -> {
+                android.util.Log.i("MokaBadges", "regdate -> " + (response == null ? "null" : response.getClass().getSimpleName()) + " err=" + (error == null ? "-" : error.text));
                 String text = null;
                 if (response instanceof TLRPC.TL_messages_botResults) {
                     for (TLRPC.BotInlineResult r : ((TLRPC.TL_messages_botResults) response).results) {

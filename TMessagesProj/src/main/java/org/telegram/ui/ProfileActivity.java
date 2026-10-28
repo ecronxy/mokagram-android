@@ -13521,7 +13521,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     boolean containsGift = false;
                     boolean containsDate = false;
                     if (position == idRow) {
-                        detailCell.setTextAndValue(String.valueOf(userId), "ID", true);
+                        detailCell.setTextAndValue(String.valueOf(userId), "ID", false);
                         containsDate = true;
                     } else if (position == birthdayRow) {
                         TLRPC.UserFull userFull = getMessagesController().getUserFull(userId);
